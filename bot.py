@@ -38,12 +38,13 @@ class BVNChecker:
         self.recipient_email = "dahmadu071@gmail.com"
         
         # File rotation settings
-        self.attempts_per_file = 10
+        self.attempts_per_file = 50
         self.scan_duration_hours = 2
         self.current_file_index = 0
         self.attempts_in_current_file = 0
         
-        # Initialize file paths
+        # Initialize file paths - using relative paths for GitHub Actions
+        self.results_dir = "bvn_results"
         self.update_file_paths()
         
         self.valid_count = 0
@@ -56,9 +57,12 @@ class BVNChecker:
 
     def update_file_paths(self):
         """Update file paths with timestamp and index"""
+        # Create results directory if it doesn't exist
+        os.makedirs(self.results_dir, exist_ok=True)
+        
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.valid_bvns_file = f"/opt/hostedtoolcache/Python/3.14.0/x64/valid_{timestamp}_{self.current_file_index}.txt"
-        self.stats_file = f"/opt/hostedtoolcache/Python/3.14.0/x64/scan_stats_{timestamp}_{self.current_file_index}.txt"
+        self.valid_bvns_file = os.path.join(self.results_dir, f"valid_{timestamp}_{self.current_file_index}.txt")
+        self.stats_file = os.path.join(self.results_dir, f"scan_stats_{timestamp}_{self.current_file_index}.txt")
         
     def rotate_file(self):
         """Rotate to a new file after reaching attempts limit"""
@@ -323,7 +327,6 @@ Attempts in Current File: {self.attempts_in_current_file}
         print("=" * 60)
 
         results = []
-        threads = []
         total_attempts_completed = 0
         
         # Main scanning loop for 2 hours
@@ -338,7 +341,7 @@ Attempts in Current File: {self.attempts_in_current_file}
                 break
             
             batch_results = []
-            batch_threads = []
+            threads = []
             
             def worker(attempt_number):
                 bvn = self.generate_bvn()
@@ -446,6 +449,7 @@ def main():
         print(f"❌ Invalid BVNs: {checker.invalid_count}")
         print(f"⚠️  Errors: {checker.error_count}")
         print(f"📁 Total files created: {checker.current_file_index + 1}")
+        print(f"📁 Results saved in directory: {checker.results_dir}")
         print(f"📊 Statistics saved to: {checker.stats_file}")
 
         if checker.valid_count > 0:
