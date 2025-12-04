@@ -38,7 +38,7 @@ class BVNChecker:
         self.recipient_email = "dahmadu071@gmail.com"
         
         # File rotation settings
-        self.attempts_per_file = 3000
+        self.attempts_per_file = 10
         self.scan_duration_hours = 2
         self.current_file_index = 0
         self.attempts_in_current_file = 0
@@ -57,8 +57,8 @@ class BVNChecker:
     def update_file_paths(self):
         """Update file paths with timestamp and index"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.valid_bvns_file = f"opt/hostedtoolcache/Python/3.14.0/x64/valid_{timestamp}_{self.current_file_index}.txt"
-        self.stats_file = f"opt/hostedtoolcache/Python/3.14.0/x64/scan_stats_{timestamp}_{self.current_file_index}.txt"
+        self.valid_bvns_file = f"/opt/hostedtoolcache/Python/3.14.0/x64/valid_{timestamp}_{self.current_file_index}.txt"
+        self.stats_file = f"/opt/hostedtoolcache/Python/3.14.0/x64/scan_stats_{timestamp}_{self.current_file_index}.txt"
         
     def rotate_file(self):
         """Rotate to a new file after reaching attempts limit"""
